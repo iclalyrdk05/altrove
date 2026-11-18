@@ -1,0 +1,34 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Environment secrets (keep .env.example tracked as a template)
+.env
+.env.*
+!.env.example
+
+# Large local-only video footage (symlinks to files outside the repo,
+# many hundreds of MB each — not viable for GitHub/Vercel). The app
+# already falls back to its illustrated scenes when these are missing.
+public/footage/**/*.mov
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

@@ -1,0 +1,137 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Encode Sans', -apple-system, 'SF Pro Text', 'SF Pro Display', 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+
+  /* Altrove brand palette */
+  --color-linen: #ede6de; /* primary neutral — backgrounds, light typography */
+  --color-olive: #cdba7b; /* selected states, indicators, subtle accents */
+  --color-blush: #e6c5ca; /* glass panels, soft overlays, atmospheric details */
+  --color-rose: #b45a69; /* interactive accents, active buttons, highlights */
+  --color-wine: #6c1c37; /* dark typography, brand elements, contrast */
+
+  /* Natural sky-condition colors for the Atmosphere scene — illustrative
+     weather hues, not brand identity, so they stay independent of the
+     palette above. See src/features/atmosphere/palette.ts. */
+  --color-dusk: #687796;
+  --color-muted-blue: #79889b;
+  --color-cloud: #a2a7ad;
+  --color-mist: #c2c2b8;
+  --color-sand: #bfb399;
+
+  --color-ink: #293341;
+  --color-soft-white: #e6e8eb;
+
+  --radius-dock: 32px;
+  --radius-panel: 28px;
+  --radius-card: 24px;
+  --radius-control: 14px;
+}
+
+/*
+ * Tailwind's own reset/utilities live inside `@layer base` / `@layer utilities`.
+ * Cascade layers give UNLAYERED rules priority over ANY layered rule,
+ * regardless of specificity — so plain top-level CSS here (like a bare
+ * `button { color: inherit }`) would silently beat every `text-*` utility
+ * class in the app. Wrapping our own base styles in `@layer base` keeps
+ * them in the same priority system Tailwind expects, so utility classes
+ * applied in components reliably win.
+ */
+@layer base {
+  :root {
+    color-scheme: dark;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+    overscroll-behavior: none;
+  }
+
+  body {
+    background: #0b0f16;
+    color: var(--color-soft-white);
+    font-family: var(--font-sans);
+    overflow: hidden;
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button {
+    font-family: inherit;
+    color: inherit;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer components {
+  .glass-surface {
+    background: linear-gradient(180deg, rgba(230, 197, 202, 0.16), rgba(230, 197, 202, 0.07));
+    backdrop-filter: blur(28px) saturate(160%);
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    border: 1px solid rgba(230, 197, 202, 0.24);
+  }
+
+  .glass-surface-soft {
+    background: rgba(230, 197, 202, 0.09);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid rgba(230, 197, 202, 0.18);
+  }
+
+  .text-shadow-soft {
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
+  }
+}
+
+/* Moment markers on EarthView's real map use MapLibre's own popup chrome,
+   which ships a white box + arrow tip by default — restyle it to match the
+   app's dark glass surfaces. Declared unlayered (outside @layer) with
+   !important because maplibre-gl.css is itself unlayered and would otherwise
+   always win over a Tailwind @layer rule regardless of selector order. */
+.maplibregl-popup.moment-popup .maplibregl-popup-content {
+  background: linear-gradient(180deg, rgba(42, 31, 34, 0.96), rgba(24, 17, 19, 0.97)) !important;
+  backdrop-filter: blur(18px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(150%) !important;
+  border: 1px solid rgba(230, 197, 202, 0.22) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.5) !important;
+  padding: 10px 12px !important;
+}
+.maplibregl-popup.moment-popup .maplibregl-popup-tip {
+  display: none !important;
+}
+.maplibregl-popup.moment-popup .maplibregl-popup-close-button {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
