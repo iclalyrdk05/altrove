@@ -95,7 +95,7 @@ export function FriendsOverlay() {
                   )}
 
                   <p className="pb-1 pt-3 text-[11px] font-medium tracking-[0.04em] text-white/35">
-                    RECOMMENDED — FRIENDS OF FRIENDS
+                    Recommended — friends of friends
                   </p>
                   {recommended.map((r) => {
                     const sent = sentRequestIds.includes(r.id)
