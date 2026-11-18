@@ -14,6 +14,17 @@ interface AudioState {
   weather: AmbienceChannelState
   /** Count of currently-playing Moment audio clips — ambient channels duck while this is > 0. */
   duckCount: number
+  /**
+   * Last stream URL actually handed to the engine for the current radio
+   * station, and last density actually handed to the engine for the current
+   * street ambience — tracked separately from `radio.stationId`/`street.optionId`
+   * because those can be reused across neighborhoods (see setRadioStation's
+   * `?? 'default'` fallback), so only these reflect what's truly already
+   * playing. Used to skip a redundant restart when SoundPanel remounts (it's
+   * conditionally rendered) and re-applies the same values it already set.
+   */
+  _radioStreamUrl: string | null
+  _streetDensity: StreetDensity | undefined
 
   unlock: () => Promise<void>
   setMasterVolume: (v: number) => void
@@ -43,6 +54,8 @@ export const useAudioStore = create<AudioState>((set, get) => ({
   street: { on: false, volume: 0.5, optionId: null, status: 'idle' },
   weather: { on: false, volume: 0.5, optionId: null, status: 'idle' },
   duckCount: 0,
+  _radioStreamUrl: null,
+  _streetDensity: undefined,
 
   requestDuck: () => {
     const next = get().duckCount + 1
@@ -85,10 +98,15 @@ export const useAudioStore = create<AudioState>((set, get) => ({
   },
 
   setRadioStation: async (stationId, streamUrl) => {
+    const current = get()
+    // Already playing exactly this stream (e.g. SoundPanel remounted and
+    // re-ran its sync effect without the neighborhood actually changing) —
+    // skip the reconnect, which would otherwise cause an audible restart.
+    if (current.radio.status === 'playing' && current._radioStreamUrl === streamUrl) return
     set((s) => ({ radio: { ...s.radio, stationId, status: 'loading' } }))
     await audioEngine.playRadio(streamUrl, (status) => set((s) => ({ radio: { ...s.radio, status } })))
     audioEngine.setRadioVolume(get().radio.on ? get().radio.volume : 0)
-    set((s) => ({ radio: { ...s.radio, on: true } }))
+    set((s) => ({ radio: { ...s.radio, on: true }, _radioStreamUrl: streamUrl }))
   },
 
   toggleRadio: (streamUrl) => {
@@ -112,9 +130,14 @@ export const useAudioStore = create<AudioState>((set, get) => ({
   },
 
   setStreetAmbience: (optionId, density) => {
+    const current = get()
+    // Already playing exactly this — skip the reconnect (see setRadioStation).
+    if (current.street.status === 'playing' && current.street.optionId === optionId && current._streetDensity === density) {
+      return
+    }
     audioEngine.setStreetAmbience(optionId, density)
     audioEngine.setStreetVolume(get().street.on ? get().street.volume : 0)
-    set((s) => ({ street: { ...s.street, optionId, status: 'playing' } }))
+    set((s) => ({ street: { ...s.street, optionId, status: 'playing' }, _streetDensity: density }))
   },
 
   toggleStreet: (defaultOption, density) => {
@@ -123,7 +146,7 @@ export const useAudioStore = create<AudioState>((set, get) => ({
     if (on) {
       audioEngine.setStreetAmbience(defaultOption, density)
       audioEngine.setStreetVolume(street.volume)
-      set((s) => ({ street: { ...s.street, on, optionId: defaultOption, status: 'playing' } }))
+      set((s) => ({ street: { ...s.street, on, optionId: defaultOption, status: 'playing' }, _streetDensity: density }))
     } else {
       // A real stop, not just a volume fade — guarantees nothing keeps
       // playing in the background once the channel is switched off.
@@ -138,6 +161,9 @@ export const useAudioStore = create<AudioState>((set, get) => ({
   },
 
   setWeatherSound: (optionId) => {
+    const current = get().weather
+    // Already playing exactly this — skip the reconnect (see setRadioStation).
+    if (current.status === 'playing' && current.optionId === optionId) return
     audioEngine.setWeatherSound(optionId)
     audioEngine.setWeatherVolume(get().weather.on ? get().weather.volume : 0)
     set((s) => ({ weather: { ...s.weather, optionId, status: 'playing' } }))
