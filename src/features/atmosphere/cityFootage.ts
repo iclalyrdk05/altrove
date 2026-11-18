@@ -107,3 +107,15 @@ export function getCityRainFootage(neighborhoodId: string, placeName?: string): 
 export function getCityNightFootage(neighborhoodId: string, placeName?: string): LocalFootage | undefined {
   return lookupCityFootage(neighborhoodId, placeName)?.night
 }
+
+/**
+ * The city's own baseline/default clip, if it has one — the last-resort
+ * real-footage fallback during storm/snow/fog (or rain, below any more
+ * specific variant), so a city with real footage but no dedicated clip for
+ * the current condition still shows ITS OWN footage (with the weather
+ * particle overlay layered on top, same as any other Atmosphere footage)
+ * rather than an unrelated generic city.
+ */
+export function getCityDefaultFootage(neighborhoodId: string, placeName?: string): LocalFootage | undefined {
+  return lookupCityFootage(neighborhoodId, placeName)?.default
+}

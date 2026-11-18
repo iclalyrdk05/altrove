@@ -1,4 +1,4 @@
-import { pickCityFootage, getCityRainFootage, getCityNightFootage } from './cityFootage'
+import { pickCityFootage, getCityRainFootage, getCityNightFootage, getCityDefaultFootage } from './cityFootage'
 import type { SkyCondition } from '@/types'
 
 export interface LocalFootage {
@@ -43,19 +43,25 @@ export function getLocalFootage(
     if (city) return city
   }
 
+  // Below this point, the condition itself is why the city-specific clip
+  // wasn't used yet (real precipitation doesn't need to be "that city" to
+  // read as true) — but if this place DOES have real footage of its own, it
+  // still beats an unrelated generic city once there's no more-specific
+  // variant left to try. The weather particle overlay (layered on top
+  // regardless of video source, see AtmosphereFootageView) still reads as
+  // true over that real footage.
+  const cityNight = !isDay ? getCityNightFootage(neighborhoodId, placeName) : undefined
+  const cityDefault = getCityDefaultFootage(neighborhoodId, placeName)
+
   switch (condition) {
     case 'storm':
-      return CLIPS.storm
+      return cityNight ?? cityDefault ?? CLIPS.storm
     case 'rain':
-      return (
-        (!isDay ? getCityNightFootage(neighborhoodId, placeName) : undefined) ??
-        getCityRainFootage(neighborhoodId, placeName) ??
-        CLIPS.rain
-      )
+      return cityNight ?? getCityRainFootage(neighborhoodId, placeName) ?? cityDefault ?? CLIPS.rain
     case 'snow':
-      return CLIPS.snow
+      return cityNight ?? cityDefault ?? CLIPS.snow
     case 'fog':
-      return CLIPS.fog
+      return cityNight ?? cityDefault ?? CLIPS.fog
     case 'cloudy':
     case 'partly-cloudy':
       return CLIPS.cloudy
