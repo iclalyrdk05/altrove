@@ -1,5 +1,6 @@
 import type { LocalFootage } from './localFootage'
 import { r2Footage } from '@/utils/r2'
+import { slugify } from '@/utils/slug'
 
 export interface CityFootageVariants {
   /** Used whenever no closer night/sunset/morning/rain match applies. Optional: a city with only e.g. a night clip falls through to the generic/local footage the rest of the day instead of showing night footage at noon. */
@@ -24,6 +25,12 @@ const MORNING_WINDOW = 0.35
  * Only listed where a strong, clearly-recognizable, properly licensed match
  * was actually found — neighborhoods not listed here keep the generic
  * condition-based clip rather than a forced, unconvincing "close enough" one.
+ *
+ * Keyed either by a curated neighborhood id (e.g. 'jordaan-amsterdam', as
+ * listed in locations/data.ts) or by a plain slugified place name (e.g.
+ * 'paris'). The latter lets footage for a place the user merely searched
+ * for — never added to the curated NEIGHBORHOODS list — still be picked up
+ * automatically, matched by `pickCityFootage`'s `placeName` fallback below.
  */
 export const CITY_FOOTAGE: Record<string, CityFootageVariants> = {
   'kadikoy-istanbul': {
@@ -58,13 +65,19 @@ export const CITY_FOOTAGE: Record<string, CityFootageVariants> = {
   },
 }
 
+/** Looks up curated footage by curated id first, falling back to a slugified place name (for searched, non-curated places). */
+function lookupCityFootage(neighborhoodId: string, placeName?: string): CityFootageVariants | undefined {
+  return CITY_FOOTAGE[neighborhoodId] ?? (placeName ? CITY_FOOTAGE[slugify(placeName)] : undefined)
+}
+
 /** Picks the closest-matching variant for this neighborhood, or undefined if it has no curated footage at all. */
 export function pickCityFootage(
   neighborhoodId: string,
   isDay: boolean,
   daylightProgress: number | null,
+  placeName?: string,
 ): LocalFootage | undefined {
-  const city = CITY_FOOTAGE[neighborhoodId]
+  const city = lookupCityFootage(neighborhoodId, placeName)
   if (!city) return undefined
   if (!isDay && city.night) return city.night
   const goldenHour = daylightProgress !== null && (daylightProgress < 0.08 || daylightProgress > 0.88)
@@ -74,8 +87,8 @@ export function pickCityFootage(
 }
 
 /** The city's own rain footage, if it has one — used instead of the generic rain clip. */
-export function getCityRainFootage(neighborhoodId: string): LocalFootage | undefined {
-  return CITY_FOOTAGE[neighborhoodId]?.rain
+export function getCityRainFootage(neighborhoodId: string, placeName?: string): LocalFootage | undefined {
+  return lookupCityFootage(neighborhoodId, placeName)?.rain
 }
 
 /**
@@ -85,6 +98,6 @@ export function getCityRainFootage(neighborhoodId: string): LocalFootage | undef
  * with no dedicated rain clip doesn't fall back to a generic, unrecognizable
  * rainy city at night.
  */
-export function getCityNightFootage(neighborhoodId: string): LocalFootage | undefined {
-  return CITY_FOOTAGE[neighborhoodId]?.night
+export function getCityNightFootage(neighborhoodId: string, placeName?: string): LocalFootage | undefined {
+  return lookupCityFootage(neighborhoodId, placeName)?.night
 }

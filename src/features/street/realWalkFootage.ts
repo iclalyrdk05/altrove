@@ -1,4 +1,5 @@
 import { r2Footage } from '@/utils/r2'
+import { slugify } from '@/utils/slug'
 
 export interface StreetFootage {
   src: string
@@ -107,8 +108,9 @@ export function getStreetWalkFootage(
   neighborhoodId: string,
   isDay: boolean,
   daylightProgress: number | null,
+  placeName?: string,
 ): StreetFootage | undefined {
-  const variants = STREET_WALK_FOOTAGE[neighborhoodId]
+  const variants = STREET_WALK_FOOTAGE[neighborhoodId] ?? (placeName ? STREET_WALK_FOOTAGE[slugify(placeName)] : undefined)
   if (!variants) return undefined
   if (!isDay && variants.night) return variants.night
   if (isDay && daylightProgress !== null && daylightProgress < MORNING_WINDOW && variants.morning) return variants.morning

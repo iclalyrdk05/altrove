@@ -57,6 +57,7 @@ export function EnvironmentCanvas({ condition, isDay, daylightProgress, windSpee
           {perspective === 'atmosphere' && (
             <AtmospherePerspective
               neighborhoodId={neighborhood.id}
+              placeName={neighborhood.name}
               cityName={neighborhood.city}
               condition={condition}
               isDay={isDay}

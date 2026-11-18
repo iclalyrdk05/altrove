@@ -28,6 +28,7 @@ export function getLocalFootage(
   condition: SkyCondition,
   isDay: boolean,
   daylightProgress: number | null,
+  placeName?: string,
 ): LocalFootage {
   const goldenHour = daylightProgress !== null && (daylightProgress < 0.08 || daylightProgress > 0.88)
 
@@ -38,7 +39,7 @@ export function getLocalFootage(
   // city-specific clip there whenever one exists.
   const isSkyCondition = condition !== 'storm' && condition !== 'rain' && condition !== 'snow' && condition !== 'fog'
   if (isSkyCondition) {
-    const city = pickCityFootage(neighborhoodId, isDay, daylightProgress)
+    const city = pickCityFootage(neighborhoodId, isDay, daylightProgress, placeName)
     if (city) return city
   }
 
@@ -46,7 +47,11 @@ export function getLocalFootage(
     case 'storm':
       return CLIPS.storm
     case 'rain':
-      return (!isDay ? getCityNightFootage(neighborhoodId) : undefined) ?? getCityRainFootage(neighborhoodId) ?? CLIPS.rain
+      return (
+        (!isDay ? getCityNightFootage(neighborhoodId, placeName) : undefined) ??
+        getCityRainFootage(neighborhoodId, placeName) ??
+        CLIPS.rain
+      )
     case 'snow':
       return CLIPS.snow
     case 'fog':

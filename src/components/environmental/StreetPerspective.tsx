@@ -44,7 +44,7 @@ export function StreetPerspective({ neighborhood, isDay, daylightProgress }: Str
   const mapillaryToken = getMapillaryToken()
   const cesiumToken = getCesiumIonToken()
   const coverage = useMapillaryCoverage(neighborhood.lat, neighborhood.lon)
-  const walkFootage = getStreetWalkFootage(neighborhood.id, isDay, daylightProgress)
+  const walkFootage = getStreetWalkFootage(neighborhood.id, isDay, daylightProgress, neighborhood.name)
   const [walkFootageFailed, setWalkFootageFailed] = useState(false)
 
   useEffect(() => {

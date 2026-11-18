@@ -8,6 +8,8 @@ import type { SkyCondition } from '@/types'
 
 interface AtmospherePerspectiveProps {
   neighborhoodId: string
+  /** The searched/curated place's own name (e.g. "Paris") — used to match footage for a place that was only ever searched, not added to the curated neighborhood list. */
+  placeName: string
   cityName: string
   condition: SkyCondition
   isDay: boolean
@@ -34,6 +36,7 @@ const PRECIPITATION_CONDITIONS: SkyCondition[] = ['storm', 'rain', 'snow', 'fog'
  */
 export function AtmospherePerspective({
   neighborhoodId,
+  placeName,
   cityName,
   condition,
   isDay,
@@ -42,10 +45,10 @@ export function AtmospherePerspective({
   reducedMotion,
 }: AtmospherePerspectiveProps) {
   const isSkyCondition = !PRECIPITATION_CONDITIONS.includes(condition)
-  const cityFootage = isSkyCondition ? pickCityFootage(neighborhoodId, isDay, daylightProgress) : undefined
+  const cityFootage = isSkyCondition ? pickCityFootage(neighborhoodId, isDay, daylightProgress, placeName) : undefined
 
   const pexels = useAtmosphereFootage(cityName, condition, isDay, daylightProgress)
-  const local = getLocalFootage(neighborhoodId, condition, isDay, daylightProgress)
+  const local = getLocalFootage(neighborhoodId, condition, isDay, daylightProgress, placeName)
   const [cityFootageFailed, setCityFootageFailed] = useState(false)
   const [localFailed, setLocalFailed] = useState(false)
 
