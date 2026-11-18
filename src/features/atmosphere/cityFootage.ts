@@ -63,6 +63,12 @@ export const CITY_FOOTAGE: Record<string, CityFootageVariants> = {
     // generic/local Atmosphere fallback instead of showing night footage at noon.
     night: { src: r2Footage('istanbul-cihangir-ambiance-night'), credit: 'Filmed by the project author' },
   },
+  // Not a curated neighborhood (not in locations/data.ts) — matched by
+  // place name instead, so searching "Paris" picks this up automatically.
+  // See lookupCityFootage's placeName fallback below.
+  paris: {
+    default: { src: r2Footage('paris-ambiance'), credit: 'Filmed by the project author' },
+  },
 }
 
 /** Looks up curated footage by curated id first, falling back to a slugified place name (for searched, non-curated places). */

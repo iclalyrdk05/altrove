@@ -25,6 +25,8 @@
   { "source": "kadikoy ambiance.mov", "slug": "kadikoy-ambiance-source", "codec": "h264" },
   { "source": "kadikoy morning street view.mov", "slug": "kadikoy-street-morning", "codec": "h264" },
   { "source": "new york upper west side- ambiance morning.mov", "slug": "upper-west-side-ambiance-morning", "codec": "h264" },
+  { "source": "paris ambiance.mov", "slug": "paris-ambiance", "codec": "h264" },
+  { "source": "paris night street view.mov", "slug": "paris-street-night", "codec": "h264" },
   { "source": "trastevere ambiance.mov", "slug": "trastevere-ambiance", "codec": "h264" },
   { "source": "trastevere street view.mov", "slug": "trastevere-street", "codec": "h264" },
   { "source": "uskudar istanbul - street view.mov", "slug": "uskudar-street", "codec": "h264" }

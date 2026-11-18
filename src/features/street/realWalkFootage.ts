@@ -8,7 +8,8 @@ export interface StreetFootage {
 }
 
 export interface StreetFootageVariants {
-  day: StreetFootage
+  /** Optional — a neighborhood with only e.g. a night clip falls through to Mapillary/Cesium/illustrated during the day instead of showing night footage at noon. */
+  day?: StreetFootage
   night?: StreetFootage
   /** Shown during the early part of the day (roughly the first third of daylight) when this city's footage was actually filmed in the morning. */
   morning?: StreetFootage
@@ -100,6 +101,14 @@ export const STREET_WALK_FOOTAGE: Record<string, StreetFootageVariants> = {
       src: r2Footage('uskudar-street'),
       credit: 'Filmed by the project author',
       description: 'Üsküdar street level, filmed on site',
+    },
+  },
+  // Not a curated neighborhood — matched by place name, see getStreetWalkFootage's placeName fallback.
+  paris: {
+    night: {
+      src: r2Footage('paris-street-night'),
+      credit: 'Filmed by the project author',
+      description: 'Paris street level at night, filmed on site',
     },
   },
 }
