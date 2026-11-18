@@ -356,6 +356,15 @@ class RadioVoice {
   private lastVolume = 0
   /** Set by the engine from master volume / mute-all, since this channel isn't routed through the Web Audio graph. */
   private masterFactor = 1
+  /**
+   * iOS Safari ignores `.volume` on media elements entirely (by design —
+   * only the hardware buttons/Control Center set device output level there),
+   * so driving mute through `masterFactor` alone silently does nothing on
+   * iOS. `.muted` is the one property iOS actually honors from JS, so it's
+   * tracked and re-applied separately, including onto a freshly created
+   * element in play() (a new <audio> always starts unmuted otherwise).
+   */
+  private isMuted = false
   /** Bumped on every play()/stop() so a stale attempt's callbacks can tell they've been superseded. */
   private generation = 0
   onStatusChange: ((status: 'idle' | 'loading' | 'playing' | 'error') => void) | null = null
@@ -381,6 +390,7 @@ class RadioVoice {
     audio.preload = 'auto'
     audio.loop = loop
     audio.volume = this.effectiveVolume()
+    audio.muted = this.isMuted
     audio.src = streamUrl
     this.element = audio
 
@@ -424,6 +434,11 @@ class RadioVoice {
   setMasterFactor(f: number) {
     this.masterFactor = f
     if (this.element) this.element.volume = this.effectiveVolume()
+  }
+
+  setMuted(muted: boolean) {
+    this.isMuted = muted
+    if (this.element) this.element.muted = muted
   }
 
   stop() {
@@ -491,7 +506,9 @@ export class AudioEngine {
     this.master!.gain.cancelScheduledValues(now)
     this.master!.gain.setTargetAtTime(muted ? 0 : this.preMuteMaster, now, 0.25)
     this.radio!.setMasterFactor(muted ? 0 : this.preMuteMaster)
+    this.radio!.setMuted(muted)
     this.streetReal!.setMasterFactor(muted ? 0 : this.preMuteMaster)
+    this.streetReal!.setMuted(muted)
   }
 
   /** `kindOrUrl` is either a synth preset id, or a real audio URL (detected by a leading "http") to loop instead. */

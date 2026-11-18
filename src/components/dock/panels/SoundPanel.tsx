@@ -3,6 +3,7 @@ import { Radio, Users as StreetIcon, CloudRain, Volume2, VolumeX } from 'lucide-
 import { useAudioStore } from '@/stores/audioStore'
 import { autoStreetAmbience, autoWeatherSound, streetDensityFromActivity } from '@/features/audio/autoSound'
 import { clsx } from '@/utils/clsx'
+import { isIOS } from '@/utils/platform'
 import type { ActivityLevel, Neighborhood, WeatherData } from '@/types'
 
 interface SoundPanelProps {
@@ -10,6 +11,8 @@ interface SoundPanelProps {
   weather: WeatherData | null
   activityLevel: ActivityLevel
 }
+
+const onIOS = isIOS()
 
 export function SoundPanel({ neighborhood, weather, activityLevel }: SoundPanelProps) {
   const audio = useAudioStore()
@@ -80,6 +83,7 @@ export function SoundPanel({ neighborhood, weather, activityLevel }: SoundPanelP
           disabled={neighborhood.radioStations.length === 0}
           onToggle={() => audio.toggleRadio(neighborhood.radioStations[0]?.streamUrl)}
           onVolume={(v) => audio.setRadioVolume(v)}
+          note={onIOS ? 'On iOS, use your device’s volume buttons to adjust this' : undefined}
         />
 
         {/* Street sounds — automatically whatever matches current activity, no picker */}
@@ -136,6 +140,7 @@ function ChannelBlock({
   disabled,
   onToggle,
   onVolume,
+  note,
 }: {
   icon: React.ReactNode
   title: string
@@ -146,6 +151,8 @@ function ChannelBlock({
   disabled?: boolean
   onToggle: () => void
   onVolume: (v: number) => void
+  /** Shown instead of a working slider when the volume control genuinely can't do anything on this platform (e.g. iOS ignoring `.volume` on a real `<audio>` element). */
+  note?: string
 }) {
   return (
     <div className="rounded-2xl bg-white/5 p-3">
@@ -179,9 +186,10 @@ function ChannelBlock({
         step={0.01}
         value={volume}
         onChange={(e) => onVolume(Number(e.target.value))}
-        disabled={!on}
+        disabled={!on || Boolean(note)}
         className="mt-2.5 w-full accent-white disabled:opacity-30"
       />
+      {note && <p className="mt-1.5 text-[10.5px] leading-snug text-white/35">{note}</p>}
     </div>
   )
 }
