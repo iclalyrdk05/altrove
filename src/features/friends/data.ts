@@ -62,3 +62,22 @@ export const DEMO_RECOMMENDED: RecommendedFriend[] = [
   { id: 'rec-2', name: 'Tomás Rivera', avatar: '🌵', mutualFriendName: 'Giulia Conti' },
   { id: 'rec-3', name: 'Haruka Ito', avatar: '🎋', mutualFriendName: 'Kenji Watanabe' },
 ]
+
+/**
+ * A broader directory of people searchable from the "Add Friends" tab —
+ * distinct from DEMO_FRIENDS/DEMO_RECOMMENDED so a search can surface
+ * someone not already connected in any way. In a connected deployment this
+ * would be a server-side user search instead of a fixed local list.
+ */
+export const DEMO_DISCOVERABLE: Pick<Friend, 'id' | 'name' | 'avatar' | 'bio'>[] = [
+  { id: 'd-1', name: 'Priya Sharma', avatar: '🪔', bio: 'Based in Istanbul for a semester abroad.' },
+  { id: 'd-2', name: 'Lucas Ferreira', avatar: '⚽', bio: 'Splits time between Rome and São Paulo.' },
+  { id: 'd-3', name: 'Mei Lin', avatar: '🍵', bio: 'Tokyo native, usually posting from Shibuya.' },
+  { id: 'd-4', name: 'Sven Andersson', avatar: '🛶', bio: 'Amsterdam-based, loves the canals at dawn.' },
+  { id: 'd-5', name: 'Fatima Al-Sayed', avatar: '🌿', bio: 'New York transplant, still exploring the Village.' },
+  { id: 'd-6', name: 'Diego Morales', avatar: '🎺', bio: 'Travels often, currently somewhere in Europe.' },
+  { id: 'd-7', name: 'Ingrid Olsen', avatar: '❄️', bio: 'Visiting Amsterdam for the winter.' },
+  { id: 'd-8', name: 'Yusuf Kaya', avatar: '🧿', bio: 'Grew up in Üsküdar, still visits every summer.' },
+  { id: 'd-9', name: 'Chloé Dubois', avatar: '🥐', bio: 'Paris-based photographer.' },
+  { id: 'd-10', name: 'Omar Haddad', avatar: '🕌', bio: 'Keeps a running list of every city he’s slept in.' },
+]

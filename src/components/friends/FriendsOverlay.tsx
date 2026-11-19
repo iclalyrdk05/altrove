@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { X, UserCheck, UserX, UserPlus, Check } from 'lucide-react'
+import { X, UserCheck, UserX, UserPlus, Check, Search } from 'lucide-react'
 import { useUIStore } from '@/stores/uiStore'
 import { useFriendsStore } from '@/stores/friendsStore'
 import { Scrim } from '@/components/shared/GlassPanel'
@@ -14,11 +14,20 @@ export function FriendsOverlay() {
   const friends = useFriendsStore((s) => s.friends)
   const requests = useFriendsStore((s) => s.requests)
   const recommended = useFriendsStore((s) => s.recommended)
+  const discoverable = useFriendsStore((s) => s.discoverable)
   const sentRequestIds = useFriendsStore((s) => s.sentRequestIds)
   const acceptRequest = useFriendsStore((s) => s.acceptRequest)
   const declineRequest = useFriendsStore((s) => s.declineRequest)
   const sendFriendRequest = useFriendsStore((s) => s.sendFriendRequest)
-  const [tab, setTab] = useState<'friends' | 'requests'>('friends')
+  const [tab, setTab] = useState<'friends' | 'requests' | 'add'>('friends')
+  const [query, setQuery] = useState('')
+
+  const searchResults = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    const pool = q ? discoverable.filter((p) => p.name.toLowerCase().includes(q)) : discoverable
+    const friendIds = new Set(friends.map((f) => f.id))
+    return pool.filter((p) => !friendIds.has(p.id))
+  }, [discoverable, friends, query])
 
   return (
     <AnimatePresence>
@@ -44,6 +53,7 @@ export function FriendsOverlay() {
                 [
                   { id: 'friends', label: 'Friends' },
                   { id: 'requests', label: `Requests${requests.length ? ` (${requests.length})` : ''}` },
+                  { id: 'add', label: 'Add Friends' },
                 ] as const
               ).map((t) => (
                 <button
@@ -120,6 +130,51 @@ export function FriendsOverlay() {
                       </div>
                     )
                   })}
+                </>
+              )}
+
+              {tab === 'add' && (
+                <>
+                  <div className="sticky top-0 z-10 -mx-4 -mt-4 bg-black/0 px-4 pb-2 pt-0">
+                    <div className="flex items-center gap-2 rounded-full bg-white/8 px-3 py-2">
+                      <Search size={14} className="shrink-0 text-white/40" />
+                      <input
+                        autoFocus
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        placeholder="Search people by name…"
+                        className="w-full bg-transparent text-[13px] text-white placeholder:text-white/35 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {searchResults.length === 0 ? (
+                    <EmptyState text={query ? 'No one found with that name.' : 'No one left to add.'} />
+                  ) : (
+                    searchResults.map((p) => {
+                      const sent = sentRequestIds.includes(p.id)
+                      return (
+                        <div key={p.id} className="flex items-center gap-3 rounded-2xl bg-white/5 p-3.5">
+                          <Avatar seed={p.id} emoji={p.avatar} size={40} />
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-[13.5px] font-medium text-white">{p.name}</p>
+                            {p.bio && <p className="truncate text-[11px] text-white/40">{p.bio}</p>}
+                          </div>
+                          <button
+                            onClick={() => sendFriendRequest(p.id)}
+                            disabled={sent}
+                            className={clsx(
+                              'flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1.5 text-[11.5px] font-medium transition-colors',
+                              sent ? 'bg-white/8 text-white/40' : 'bg-white/12 text-white/80 hover:bg-white/20',
+                            )}
+                          >
+                            {sent ? <Check size={13} /> : <UserPlus size={13} />}
+                            {sent ? 'Requested' : 'Add'}
+                          </button>
+                        </div>
+                      )
+                    })
+                  )}
                 </>
               )}
             </div>
