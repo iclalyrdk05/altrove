@@ -109,15 +109,6 @@ export interface Friend {
   shareExpiresAt: string | null
 }
 
-/** A friend-of-a-friend suggestion, surfaced under Requests so the friend graph can grow past direct invites. */
-export interface RecommendedFriend {
-  id: string
-  name: string
-  avatar: string
-  /** Name of the mutual friend this suggestion came through. */
-  mutualFriendName: string
-}
-
 export interface AudioChannelState {
   on: boolean
   volume: number

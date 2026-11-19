@@ -13,13 +13,12 @@ export function FriendsOverlay() {
   const setOpen = useUIStore((s) => s.setFriendsOverlayOpen)
   const friends = useFriendsStore((s) => s.friends)
   const requests = useFriendsStore((s) => s.requests)
-  const recommended = useFriendsStore((s) => s.recommended)
   const discoverable = useFriendsStore((s) => s.discoverable)
   const sentRequestIds = useFriendsStore((s) => s.sentRequestIds)
   const acceptRequest = useFriendsStore((s) => s.acceptRequest)
   const declineRequest = useFriendsStore((s) => s.declineRequest)
   const sendFriendRequest = useFriendsStore((s) => s.sendFriendRequest)
-  const [tab, setTab] = useState<'friends' | 'requests' | 'add'>('friends')
+  const [tab, setTab] = useState<'friends' | 'add'>('friends')
   const [query, setQuery] = useState('')
 
   // A fresh search context per tab — carrying a query over from "Add
@@ -64,8 +63,7 @@ export function FriendsOverlay() {
               {(
                 [
                   { id: 'friends', label: 'Friends' },
-                  { id: 'requests', label: `Requests${requests.length ? ` (${requests.length})` : ''}` },
-                  { id: 'add', label: 'Add Friends' },
+                  { id: 'add', label: `Add Friends${requests.length ? ` (${requests.length})` : ''}` },
                 ] as const
               ).map((t) => (
                 <button
@@ -81,19 +79,17 @@ export function FriendsOverlay() {
               ))}
             </div>
 
-            {tab !== 'requests' && (
-              <div className="px-4 pt-3">
-                <div className="flex items-center gap-2 rounded-full bg-white/8 px-3 py-2">
-                  <Search size={14} className="shrink-0 text-white/40" />
-                  <input
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder={tab === 'friends' ? 'Search your friends…' : 'Search people by name…'}
-                    className="w-full bg-transparent text-[13px] text-white placeholder:text-white/35 focus:outline-none"
-                  />
-                </div>
+            <div className="px-4 pt-3">
+              <div className="flex items-center gap-2 rounded-full bg-white/8 px-3 py-2">
+                <Search size={14} className="shrink-0 text-white/40" />
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={tab === 'friends' ? 'Search your friends…' : 'Search people by name…'}
+                  className="w-full bg-transparent text-[13px] text-white placeholder:text-white/35 focus:outline-none"
+                />
               </div>
-            )}
+            </div>
 
             <div className="flex-1 space-y-2 overflow-y-auto p-4">
               {tab === 'friends' &&
@@ -103,64 +99,34 @@ export function FriendsOverlay() {
                   filteredFriends.map((f) => <FriendCard key={f.id} friend={f} />)
                 ))}
 
-              {tab === 'requests' && (
-                <>
-                  {requests.length === 0 ? (
-                    <EmptyState text="No pending friend requests." />
-                  ) : (
-                    requests.map((r) => (
-                      <div key={r.id} className="flex items-center gap-3 rounded-2xl bg-white/5 p-3.5">
-                        <Avatar seed={r.id} emoji={r.avatar} size={40} />
-                        <p className="flex-1 text-[13.5px] font-medium text-white">{r.name}</p>
-                        <button
-                          onClick={() => acceptRequest(r.id)}
-                          className="flex items-center gap-1 rounded-full bg-linen px-2.5 py-1.5 text-[11.5px] font-semibold text-wine hover:bg-white"
-                          style={{ color: '#6c1c37' }}
-                        >
-                          <UserCheck size={13} />
-                          Accept
-                        </button>
-                        <button
-                          onClick={() => declineRequest(r.id)}
-                          className="flex items-center gap-1 rounded-full bg-white/8 px-2.5 py-1.5 text-[11.5px] text-white/55 hover:bg-white/15"
-                        >
-                          <UserX size={13} />
-                        </button>
-                      </div>
-                    ))
-                  )}
-
-                  <p className="pb-1 pt-3 text-[11px] font-medium tracking-[0.04em] text-white/35">
-                    Friends of Friends
-                  </p>
-                  {recommended.map((r) => {
-                    const sent = sentRequestIds.includes(r.id)
-                    return (
-                      <div key={r.id} className="flex items-center gap-3 rounded-2xl bg-white/5 p-3.5">
-                        <Avatar seed={r.id} emoji={r.avatar} size={40} />
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-[13.5px] font-medium text-white">{r.name}</p>
-                          <p className="truncate text-[11px] text-white/40">via {r.mutualFriendName}</p>
-                        </div>
-                        <button
-                          onClick={() => sendFriendRequest(r.id)}
-                          disabled={sent}
-                          className={clsx(
-                            'flex items-center gap-1 rounded-full px-2.5 py-1.5 text-[11.5px] font-medium transition-colors',
-                            sent ? 'bg-white/8 text-white/40' : 'bg-white/12 text-white/80 hover:bg-white/20',
-                          )}
-                        >
-                          {sent ? <Check size={13} /> : <UserPlus size={13} />}
-                          {sent ? 'Requested' : 'Add'}
-                        </button>
-                      </div>
-                    )
-                  })}
-                </>
-              )}
-
               {tab === 'add' && (
                 <>
+                  {requests.length > 0 && (
+                    <>
+                      {requests.map((r) => (
+                        <div key={r.id} className="flex items-center gap-3 rounded-2xl bg-white/5 p-3.5">
+                          <Avatar seed={r.id} emoji={r.avatar} size={40} />
+                          <p className="flex-1 text-[13.5px] font-medium text-white">{r.name}</p>
+                          <button
+                            onClick={() => acceptRequest(r.id)}
+                            className="flex items-center gap-1 rounded-full bg-linen px-2.5 py-1.5 text-[11.5px] font-semibold text-wine hover:bg-white"
+                            style={{ color: '#6c1c37' }}
+                          >
+                            <UserCheck size={13} />
+                            Accept
+                          </button>
+                          <button
+                            onClick={() => declineRequest(r.id)}
+                            className="flex items-center gap-1 rounded-full bg-white/8 px-2.5 py-1.5 text-[11.5px] text-white/55 hover:bg-white/15"
+                          >
+                            <UserX size={13} />
+                          </button>
+                        </div>
+                      ))}
+                      <p className="pb-1 pt-3 text-[11px] font-medium tracking-[0.04em] text-white/35">Everyone</p>
+                    </>
+                  )}
+
                   {searchResults.length === 0 ? (
                     <EmptyState text={query ? 'No one found with that name.' : 'No one left to add.'} />
                   ) : (

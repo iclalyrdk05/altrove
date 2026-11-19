@@ -1,4 +1,4 @@
-import type { Friend, RecommendedFriend } from '@/types'
+import type { Friend } from '@/types'
 
 /**
  * Demonstration friends. In a connected deployment these would be real
@@ -56,18 +56,11 @@ export const DEMO_FRIEND_REQUESTS: Pick<Friend, 'id' | 'name' | 'avatar'>[] = [
   { id: 'r-1', name: 'Marco Bianchi', avatar: '⛵' },
 ]
 
-/** Friends-of-friends suggested under Requests, so the graph can grow past direct invites. */
-export const DEMO_RECOMMENDED: RecommendedFriend[] = [
-  { id: 'rec-1', name: 'Eva Lindqvist', avatar: '🧵', mutualFriendName: 'Noah Bergström' },
-  { id: 'rec-2', name: 'Tomás Rivera', avatar: '🌵', mutualFriendName: 'Giulia Conti' },
-  { id: 'rec-3', name: 'Haruka Ito', avatar: '🎋', mutualFriendName: 'Kenji Watanabe' },
-]
-
 /**
  * A broader directory of people searchable from the "Add Friends" tab —
- * distinct from DEMO_FRIENDS/DEMO_RECOMMENDED so a search can surface
- * someone not already connected in any way. In a connected deployment this
- * would be a server-side user search instead of a fixed local list.
+ * distinct from DEMO_FRIENDS so a search can surface someone not already
+ * connected in any way. In a connected deployment this would be a
+ * server-side user search instead of a fixed local list.
  */
 export const DEMO_DISCOVERABLE: Pick<Friend, 'id' | 'name' | 'avatar' | 'bio'>[] = [
   { id: 'd-1', name: 'Priya Sharma', avatar: '🪔', bio: 'Based in Istanbul for a semester abroad.' },
@@ -80,4 +73,7 @@ export const DEMO_DISCOVERABLE: Pick<Friend, 'id' | 'name' | 'avatar' | 'bio'>[]
   { id: 'd-8', name: 'Yusuf Kaya', avatar: '🧿', bio: 'Grew up in Üsküdar, still visits every summer.' },
   { id: 'd-9', name: 'Chloé Dubois', avatar: '🥐', bio: 'Paris-based photographer.' },
   { id: 'd-10', name: 'Omar Haddad', avatar: '🕌', bio: 'Keeps a running list of every city he’s slept in.' },
+  { id: 'd-11', name: 'Eva Lindqvist', avatar: '🧵', bio: 'Textile designer, friend of Noah Bergström.' },
+  { id: 'd-12', name: 'Tomás Rivera', avatar: '🌵', bio: 'Friend of Giulia Conti, usually traveling.' },
+  { id: 'd-13', name: 'Haruka Ito', avatar: '🎋', bio: 'Friend of Kenji Watanabe, based near Tokyo.' },
 ]

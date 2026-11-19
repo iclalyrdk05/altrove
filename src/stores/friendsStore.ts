@@ -1,14 +1,13 @@
 import { create } from 'zustand'
-import { DEMO_FRIENDS, DEMO_FRIEND_REQUESTS, DEMO_RECOMMENDED, DEMO_DISCOVERABLE } from '@/features/friends/data'
+import { DEMO_FRIENDS, DEMO_FRIEND_REQUESTS, DEMO_DISCOVERABLE } from '@/features/friends/data'
 import type { Friend } from '@/types'
 
 interface FriendsState {
   friends: Friend[]
   requests: typeof DEMO_FRIEND_REQUESTS
-  recommended: typeof DEMO_RECOMMENDED
   /** The searchable people directory for the "Add Friends" tab. */
   discoverable: typeof DEMO_DISCOVERABLE
-  /** Recommended-friend ids a request has already been sent to this session. */
+  /** Discoverable-person ids a request has already been sent to this session. */
   sentRequestIds: string[]
   acceptRequest: (id: string) => void
   declineRequest: (id: string) => void
@@ -20,7 +19,6 @@ interface FriendsState {
 export const useFriendsStore = create<FriendsState>((set) => ({
   friends: DEMO_FRIENDS,
   requests: DEMO_FRIEND_REQUESTS,
-  recommended: DEMO_RECOMMENDED,
   discoverable: DEMO_DISCOVERABLE,
   sentRequestIds: [],
 
