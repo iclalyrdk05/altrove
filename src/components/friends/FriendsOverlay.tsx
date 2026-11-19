@@ -22,6 +22,18 @@ export function FriendsOverlay() {
   const [tab, setTab] = useState<'friends' | 'requests' | 'add'>('friends')
   const [query, setQuery] = useState('')
 
+  // A fresh search context per tab — carrying a query over from "Add
+  // Friends" into "Friends" (or back) would filter against the wrong list.
+  function switchTab(id: typeof tab) {
+    setTab(id)
+    setQuery('')
+  }
+
+  const filteredFriends = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return q ? friends.filter((f) => f.name.toLowerCase().includes(q)) : friends
+  }, [friends, query])
+
   const searchResults = useMemo(() => {
     const q = query.trim().toLowerCase()
     const pool = q ? discoverable.filter((p) => p.name.toLowerCase().includes(q)) : discoverable
@@ -58,7 +70,7 @@ export function FriendsOverlay() {
               ).map((t) => (
                 <button
                   key={t.id}
-                  onClick={() => setTab(t.id)}
+                  onClick={() => switchTab(t.id)}
                   className={clsx(
                     'rounded-full px-3 py-1 text-[11.5px] font-medium transition-colors',
                     tab === t.id ? 'bg-white/18 text-white' : 'text-white/45 hover:text-white/70',
@@ -69,12 +81,26 @@ export function FriendsOverlay() {
               ))}
             </div>
 
+            {tab !== 'requests' && (
+              <div className="px-4 pt-3">
+                <div className="flex items-center gap-2 rounded-full bg-white/8 px-3 py-2">
+                  <Search size={14} className="shrink-0 text-white/40" />
+                  <input
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder={tab === 'friends' ? 'Search your friends…' : 'Search people by name…'}
+                    className="w-full bg-transparent text-[13px] text-white placeholder:text-white/35 focus:outline-none"
+                  />
+                </div>
+              </div>
+            )}
+
             <div className="flex-1 space-y-2 overflow-y-auto p-4">
               {tab === 'friends' &&
-                (friends.length === 0 ? (
-                  <EmptyState text="No friends yet." />
+                (filteredFriends.length === 0 ? (
+                  <EmptyState text={query ? 'No friends found with that name.' : 'No friends yet.'} />
                 ) : (
-                  friends.map((f) => <FriendCard key={f.id} friend={f} />)
+                  filteredFriends.map((f) => <FriendCard key={f.id} friend={f} />)
                 ))}
 
               {tab === 'requests' && (
@@ -135,19 +161,6 @@ export function FriendsOverlay() {
 
               {tab === 'add' && (
                 <>
-                  <div className="sticky top-0 z-10 -mx-4 -mt-4 bg-black/0 px-4 pb-2 pt-0">
-                    <div className="flex items-center gap-2 rounded-full bg-white/8 px-3 py-2">
-                      <Search size={14} className="shrink-0 text-white/40" />
-                      <input
-                        autoFocus
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Search people by name…"
-                        className="w-full bg-transparent text-[13px] text-white placeholder:text-white/35 focus:outline-none"
-                      />
-                    </div>
-                  </div>
-
                   {searchResults.length === 0 ? (
                     <EmptyState text={query ? 'No one found with that name.' : 'No one left to add.'} />
                   ) : (
