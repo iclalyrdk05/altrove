@@ -161,7 +161,7 @@ export function LocationOverlay() {
                           className="flex h-7 w-7 items-center justify-center rounded-full text-white/50 hover:bg-white/10 hover:text-white"
                           aria-label={saved_ ? 'Remove from saved' : 'Save place'}
                         >
-                          {saved_ ? <BookmarkCheck size={14} className="text-rose" /> : <Bookmark size={14} />}
+                          {saved_ ? <BookmarkCheck size={14} className="text-linen" /> : <Bookmark size={14} />}
                         </button>
                       </div>
                     )}
