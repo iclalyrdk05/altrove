@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { Search, X, Clock, Bookmark, BookmarkCheck, Check, Compass } from 'lucide-react'
+import { Search, X, Clock, Bookmark, Check, Compass } from 'lucide-react'
 import { NEIGHBORHOODS } from '@/features/locations/data'
 import { neighborhoodFromGeocode } from '@/features/locations/custom'
 import { searchPlaces, type GeocodeResult } from '@/providers/weather'
@@ -161,7 +161,7 @@ export function LocationOverlay() {
                           className="flex h-7 w-7 items-center justify-center rounded-full text-white/50 hover:bg-white/10 hover:text-white"
                           aria-label={saved_ ? 'Remove from saved' : 'Save place'}
                         >
-                          {saved_ ? <BookmarkCheck size={14} className="text-linen" /> : <Bookmark size={14} />}
+                          <Bookmark size={14} className={saved_ ? 'fill-linen text-linen' : ''} />
                         </button>
                       </div>
                     )}
