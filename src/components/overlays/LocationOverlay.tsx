@@ -18,7 +18,6 @@ export function LocationOverlay() {
   const debouncedQuery = useDebouncedValue(query, 350)
   const [results, setResults] = useState<GeocodeResult[]>([])
   const [searching, setSearching] = useState(false)
-  const [candidate, setCandidate] = useState<Neighborhood | null>(null)
   const [tab, setTab] = useState<'curated' | 'recent' | 'saved'>('curated')
 
   const current = useLocationStore((s) => s.current)
@@ -32,11 +31,8 @@ export function LocationOverlay() {
     if (!open) {
       setQuery('')
       setResults([])
-      setCandidate(null)
-      return
     }
-    setCandidate(current)
-  }, [open, current])
+  }, [open])
 
   useEffect(() => {
     if (!debouncedQuery.trim()) {
@@ -60,9 +56,8 @@ export function LocationOverlay() {
       )
     : NEIGHBORHOODS
 
-  function confirm() {
-    if (!candidate) return
-    setLocation(candidate)
+  function visit(n: Neighborhood) {
+    setLocation(n)
     setOpen(false)
   }
 
@@ -133,64 +128,45 @@ export function LocationOverlay() {
               )}
               {list.map((item, i) => {
                 const n = item.kind === 'curated' ? item.n : neighborhoodFromGeocode(item.r)
-                const isActive = candidate?.id === n.id
+                const isActive = current.id === n.id
+                const saved_ = isSaved(n.id)
                 return (
-                  <button
+                  <div
                     key={`${item.kind}-${i}-${n.id}`}
-                    onClick={() => setCandidate(n)}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => visit(n)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') visit(n)
+                    }}
                     className={clsx(
-                      'mb-1 flex w-full items-center justify-between rounded-2xl px-3 py-2.5 text-left transition-colors',
+                      'mb-1 flex w-full cursor-pointer items-center justify-between gap-2 rounded-2xl px-3 py-2.5 text-left transition-colors',
                       isActive ? 'bg-white/15' : 'hover:bg-white/8',
                     )}
                   >
-                    <div>
-                      <p className="text-[13.5px] font-medium text-white">{n.name}</p>
-                      <p className="text-[11.5px] text-white/45">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[13.5px] font-medium text-white">{n.name}</p>
+                      <p className="truncate text-[11.5px] text-white/45">
                         {n.city}, {n.country}
                       </p>
                     </div>
-                    {isActive && <Check size={15} className="text-olive" />}
-                  </button>
+                    <div className="flex shrink-0 items-center gap-1">
+                      {isActive && <Check size={15} className="text-olive" />}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          toggleSaved(n)
+                        }}
+                        className="flex h-7 w-7 items-center justify-center rounded-full text-white/50 hover:bg-white/10 hover:text-white"
+                        aria-label={saved_ ? 'Remove from saved' : 'Save place'}
+                      >
+                        {saved_ ? <BookmarkCheck size={14} className="text-rose" /> : <Bookmark size={14} />}
+                      </button>
+                    </div>
+                  </div>
                 )
               })}
             </div>
-
-            {/* compact selected-neighborhood summary + actions — no separate map panel */}
-            <AnimatePresence>
-              {candidate && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="shrink-0 border-t border-white/10 p-4"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="truncate text-[15px] font-semibold text-white">{candidate.name}</p>
-                      <p className="text-[12px] text-white/55">
-                        {candidate.city}, {candidate.country}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => toggleSaved(candidate)}
-                      className="glass-surface-soft flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white/70 hover:text-white"
-                      aria-label="Save place"
-                    >
-                      {isSaved(candidate.id) ? <BookmarkCheck size={15} /> : <Bookmark size={15} />}
-                    </button>
-                  </div>
-                  <p className="mt-1.5 line-clamp-2 text-[12px] leading-snug text-white/55">{candidate.blurb}</p>
-                  <button
-                    onClick={confirm}
-                    disabled={candidate.id === current.id}
-                    className="mt-3 w-full rounded-full bg-linen py-2.5 text-[13px] font-semibold text-wine transition-opacity hover:bg-white disabled:opacity-40"
-                    style={{ color: '#6c1c37' }}
-                  >
-                    {candidate.id === current.id ? 'Currently Viewing' : 'Visit This Neighborhood'}
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </motion.div>
         </>
       )}

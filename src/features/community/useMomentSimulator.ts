@@ -3,8 +3,8 @@ import { useCommunityStore } from '@/stores/communityStore'
 import { useLocationStore } from '@/stores/locationStore'
 import { SIMULATED_MOMENT_POOL } from './simulatedMoments'
 
-const MIN_DELAY_MS = 40_000
-const MAX_DELAY_MS = 100_000
+const MIN_DELAY_MS = 12_000
+const MAX_DELAY_MS = 18_000
 
 /**
  * Drip-feeds one simulated Moment at a time into the currently-open
