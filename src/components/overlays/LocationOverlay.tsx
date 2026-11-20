@@ -150,19 +150,21 @@ export function LocationOverlay() {
                         {n.city}, {n.country}
                       </p>
                     </div>
-                    <div className="flex shrink-0 items-center gap-1">
-                      {isActive && <Check size={15} className="text-olive" />}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          toggleSaved(n)
-                        }}
-                        className="flex h-7 w-7 items-center justify-center rounded-full text-white/50 hover:bg-white/10 hover:text-white"
-                        aria-label={saved_ ? 'Remove from saved' : 'Save place'}
-                      >
-                        {saved_ ? <BookmarkCheck size={14} className="text-rose" /> : <Bookmark size={14} />}
-                      </button>
-                    </div>
+                    {isActive && (
+                      <div className="flex shrink-0 items-center gap-1">
+                        <Check size={15} className="text-olive" />
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            toggleSaved(n)
+                          }}
+                          className="flex h-7 w-7 items-center justify-center rounded-full text-white/50 hover:bg-white/10 hover:text-white"
+                          aria-label={saved_ ? 'Remove from saved' : 'Save place'}
+                        >
+                          {saved_ ? <BookmarkCheck size={14} className="text-rose" /> : <Bookmark size={14} />}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )
               })}
